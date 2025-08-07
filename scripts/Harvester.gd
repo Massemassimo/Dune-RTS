@@ -8,7 +8,7 @@ class_name Harvester
 
 # Harvester state
 var current_spice: int = 0
-var target_spice_deposit: SpiceDeposit = null
+var target_spice_deposit = null
 var target_refinery = null
 var harvester_state: GlobalEnums.HarvesterState = GlobalEnums.HarvesterState.IDLE
 
@@ -17,7 +17,7 @@ var collection_timer: float = 0.0
 var collection_interval: float = 1.0
 
 func _ready():
-	super._ready()
+	super()
 	unit_name = "Harvester"
 	max_health = 120.0
 	current_health = max_health
@@ -55,7 +55,7 @@ func setup_harvester_visuals():
 	add_child(sprite)
 
 func _process(delta):
-	super._process(delta)
+	super(delta)
 	handle_harvester_behavior(delta)
 
 func handle_harvester_behavior(delta):
@@ -126,7 +126,7 @@ func handle_spice_unloading(delta):
 
 func find_spice_deposit():
 	var spice_deposits = get_tree().get_nodes_in_group("spice_deposits")
-	var nearest_deposit: SpiceDeposit = null
+	var nearest_deposit = null
 	var nearest_distance: float = INF
 	
 	for deposit in spice_deposits:
