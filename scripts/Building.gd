@@ -16,7 +16,7 @@ signal construction_complete(building: Building)
 
 # Building state
 var current_health: float
-var faction: GameManager.Faction = GameManager.Faction.NEUTRAL
+var faction: GlobalEnums.Faction = GlobalEnums.Faction.NEUTRAL
 var is_selected: bool = false
 var is_constructed: bool = false
 var construction_progress: float = 0.0
@@ -54,11 +54,11 @@ func setup_visuals():
 	# Color based on faction and building type
 	var color: Color
 	match faction:
-		GameManager.Faction.ATREIDES:
+		GlobalEnums.Faction.ATREIDES:
 			color = Color.DARK_BLUE
-		GameManager.Faction.HARKONNEN:
+		GlobalEnums.Faction.HARKONNEN:
 			color = Color.DARK_RED
-		GameManager.Faction.ORDOS:
+		GlobalEnums.Faction.ORDOS:
 			color = Color.DARK_GREEN
 		_:
 			color = Color.DIM_GRAY
@@ -266,7 +266,7 @@ func _draw():
 		# Draw selection rectangle
 		draw_rect(Rect2(-35, -35, 70, 70), Color.WHITE, false, 2.0)
 
-func set_faction(new_faction: GameManager.Faction):
+func set_faction(new_faction: GlobalEnums.Faction):
 	faction = new_faction
 	if sprite:
 		setup_visuals()

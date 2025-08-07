@@ -78,11 +78,11 @@ func setup_tank_visuals():
 	
 	var color: Color
 	match faction:
-		GameManager.Faction.ATREIDES:
+		GlobalEnums.Faction.ATREIDES:
 			color = Color(0.3, 0.5, 0.9)  # Blue
-		GameManager.Faction.HARKONNEN:
+		GlobalEnums.Faction.HARKONNEN:
 			color = Color(0.9, 0.3, 0.3)  # Red
-		GameManager.Faction.ORDOS:
+		GlobalEnums.Faction.ORDOS:
 			color = Color(0.3, 0.9, 0.3)  # Green
 		_:
 			color = Color.GRAY

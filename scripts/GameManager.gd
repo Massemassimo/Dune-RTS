@@ -1,32 +1,16 @@
 extends Node2D
 class_name GameManager
 
-# Game state management
-enum GameState {
-	MENU,
-	PLAYING,
-	PAUSED,
-	GAME_OVER
-}
-
-# Player factions
-enum Faction {
-	ATREIDES,
-	HARKONNEN,
-	ORDOS,
-	NEUTRAL
-}
-
 # Signals for game events
 signal spice_changed(new_amount: int)
 signal unit_selected(unit: Unit)
 signal unit_deselected(unit: Unit)
-signal game_state_changed(new_state: GameState)
+signal game_state_changed(new_state: GlobalEnums.GameState)
 
 # Game state
-var current_state: GameState = GameState.MENU
-var player_faction: Faction = Faction.ATREIDES
-var ai_faction: Faction = Faction.HARKONNEN
+var current_state: GlobalEnums.GameState = GlobalEnums.GameState.MENU
+var player_faction: GlobalEnums.Faction = GlobalEnums.Faction.ATREIDES
+var ai_faction: GlobalEnums.Faction = GlobalEnums.Faction.HARKONNEN
 
 # Resources
 var player_spice: int = 1000
@@ -52,9 +36,9 @@ func _ready():
 
 func setup_game():
 	# Initialize game systems
-	current_state = GameState.PLAYING
-	player_spice = STARTING_SPICE
-	ai_spice = STARTING_SPICE
+	current_state = GlobalEnums.GameState.PLAYING
+	player_spice = GlobalEnums.STARTING_SPICE
+	ai_spice = GlobalEnums.STARTING_SPICE
 	
 	# Find key nodes
 	camera = get_node_or_null("Camera2D")
@@ -113,7 +97,7 @@ func _on_unit_died(unit: Unit):
 func _on_building_destroyed(building: Building):
 	all_buildings.erase(building)
 
-func _on_spice_collected(amount: int, faction: Faction):
+func _on_spice_collected(amount: int, faction: GlobalEnums.Faction):
 	if faction == player_faction:
 		add_spice(amount)
 	elif faction == ai_faction:
@@ -161,17 +145,17 @@ func get_ai_spice() -> int:
 	return ai_spice
 
 func pause_game():
-	current_state = GameState.PAUSED
+	current_state = GlobalEnums.GameState.PAUSED
 	get_tree().paused = true
 	game_state_changed.emit(current_state)
 
 func resume_game():
-	current_state = GameState.PLAYING
+	current_state = GlobalEnums.GameState.PLAYING
 	get_tree().paused = false
 	game_state_changed.emit(current_state)
 
 func end_game(player_won: bool):
-	current_state = GameState.GAME_OVER
+	current_state = GlobalEnums.GameState.GAME_OVER
 	game_state_changed.emit(current_state)
 	if player_won:
 		print("Victory! Player wins!")

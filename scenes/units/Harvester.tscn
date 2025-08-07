@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cqxbsokw1hk5v"]
 
-[ext_resource type="Script" path="res://scripts/Harvester.gd" id="1_7t4k6"]
+[ext_resource type="Script" uid="uid://w5jyhe50nd8b" path="res://scripts/Harvester.gd" id="1_7t4k6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(38, 28)

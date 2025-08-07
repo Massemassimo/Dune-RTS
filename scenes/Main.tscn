@@ -1,16 +1,16 @@
 [gd_scene load_steps=7 format=3 uid="uid://b4kxmjnqrmq8w"]
 
-[ext_resource type="Script" path="res://scripts/GameManager.gd" id="1_0k8xw"]
-[ext_resource type="Script" path="res://scripts/InputManager.gd" id="2_5n7j8"]
-[ext_resource type="Script" path="res://scripts/SpiceDeposit.gd" id="3_r4jv9"]
-[ext_resource type="Script" path="res://scripts/UIManager.gd" id="4_ui_manager"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 25.0
+[ext_resource type="Script" uid="uid://c3jhuyj2s0btf" path="res://scripts/GameManager.gd" id="1_0k8xw"]
+[ext_resource type="Script" uid="uid://3xqsqu01imun" path="res://scripts/InputManager.gd" id="2_5n7j8"]
+[ext_resource type="Script" uid="uid://iflwk5m00ml5" path="res://scripts/SpiceDeposit.gd" id="3_r4jv9"]
+[ext_resource type="Script" uid="uid://dm52qwj0ad7w2" path="res://scripts/UIManager.gd" id="4_ui_manager"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 1
 background_color = Color(0.4, 0.3, 0.2, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 25.0
 
 [node name="Main" type="Node2D"]
 

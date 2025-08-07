@@ -3,7 +3,7 @@ class_name Unit
 
 # Unit signals
 signal unit_died(unit: Unit)
-signal spice_collected(amount: int, faction: GameManager.Faction)
+signal spice_collected(amount: int, faction: GlobalEnums.Faction)
 signal unit_attacked(attacker: Unit, target: Unit)
 
 # Unit properties
@@ -17,7 +17,7 @@ signal unit_attacked(attacker: Unit, target: Unit)
 
 # Unit state
 var current_health: float
-var faction: GameManager.Faction = GameManager.Faction.NEUTRAL
+var faction: GlobalEnums.Faction = GlobalEnums.Faction.NEUTRAL
 var is_selected: bool = false
 var is_moving: bool = false
 var is_attacking: bool = false
@@ -55,11 +55,11 @@ func setup_visuals():
 	# Color based on faction
 	var color: Color
 	match faction:
-		GameManager.Faction.ATREIDES:
+		GlobalEnums.Faction.ATREIDES:
 			color = Color.BLUE
-		GameManager.Faction.HARKONNEN:
+		GlobalEnums.Faction.HARKONNEN:
 			color = Color.RED
-		GameManager.Faction.ORDOS:
+		GlobalEnums.Faction.ORDOS:
 			color = Color.GREEN
 		_:
 			color = Color.GRAY
@@ -142,7 +142,7 @@ func handle_combat(delta):
 
 func handle_ai(delta):
 	# Basic AI behavior for non-player units
-	if faction != GameManager.Faction.ATREIDES:  # Assuming player is Atreides for now
+	if faction != GlobalEnums.Faction.ATREIDES:  # Assuming player is Atreides for now
 		ai_behavior_timer += delta
 		if ai_behavior_timer >= ai_behavior_interval:
 			ai_behavior_timer = 0.0
@@ -224,7 +224,7 @@ func _draw():
 		# Draw selection circle
 		draw_arc(Vector2.ZERO, 25, 0, TAU, 32, Color.WHITE, 2.0)
 
-func set_faction(new_faction: GameManager.Faction):
+func set_faction(new_faction: GlobalEnums.Faction):
 	faction = new_faction
 	if sprite:
 		setup_visuals()  # Update color

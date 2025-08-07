@@ -10,16 +10,7 @@ class_name Harvester
 var current_spice: int = 0
 var target_spice_deposit: SpiceDeposit = null
 var target_refinery: Building = null
-var harvester_state: HarvesterState = HarvesterState.IDLE
-
-enum HarvesterState {
-	IDLE,
-	MOVING_TO_SPICE,
-	COLLECTING_SPICE,
-	MOVING_TO_REFINERY,
-	UNLOADING_SPICE,
-	RETURNING_TO_SPICE
-}
+var harvester_state: GlobalEnums.HarvesterState = GlobalEnums.HarvesterState.IDLE
 
 # Collection timer
 var collection_timer: float = 0.0
@@ -49,11 +40,11 @@ func setup_harvester_visuals():
 	
 	var color: Color
 	match faction:
-		GameManager.Faction.ATREIDES:
+		GlobalEnums.Faction.ATREIDES:
 			color = Color(0.2, 0.4, 0.8)  # Dark blue
-		GameManager.Faction.HARKONNEN:
+		GlobalEnums.Faction.HARKONNEN:
 			color = Color(0.8, 0.2, 0.2)  # Dark red
-		GameManager.Faction.ORDOS:
+		GlobalEnums.Faction.ORDOS:
 			color = Color(0.2, 0.8, 0.2)  # Dark green
 		_:
 			color = Color.GRAY
@@ -69,32 +60,32 @@ func _process(delta):
 
 func handle_harvester_behavior(delta):
 	match harvester_state:
-		HarvesterState.IDLE:
+		GlobalEnums.HarvesterState.IDLE:
 			find_spice_deposit()
 		
-		HarvesterState.MOVING_TO_SPICE:
+		GlobalEnums.HarvesterState.MOVING_TO_SPICE:
 			if not is_moving and target_spice_deposit:
 				var distance = global_position.distance_to(target_spice_deposit.global_position)
 				if distance <= collection_range:
-					harvester_state = HarvesterState.COLLECTING_SPICE
+					harvester_state = GlobalEnums.HarvesterState.COLLECTING_SPICE
 					print("%s reached spice deposit" % unit_name)
 		
-		HarvesterState.COLLECTING_SPICE:
+		GlobalEnums.HarvesterState.COLLECTING_SPICE:
 			handle_spice_collection(delta)
 		
-		HarvesterState.MOVING_TO_REFINERY:
+		GlobalEnums.HarvesterState.MOVING_TO_REFINERY:
 			if not is_moving and target_refinery:
 				var distance = global_position.distance_to(target_refinery.global_position)
 				if distance <= 80.0:  # Close to refinery
-					harvester_state = HarvesterState.UNLOADING_SPICE
+					harvester_state = GlobalEnums.HarvesterState.UNLOADING_SPICE
 					print("%s reached refinery" % unit_name)
 		
-		HarvesterState.UNLOADING_SPICE:
+		GlobalEnums.HarvesterState.UNLOADING_SPICE:
 			handle_spice_unloading(delta)
 
 func handle_spice_collection(delta):
 	if not target_spice_deposit or not is_instance_valid(target_spice_deposit):
-		harvester_state = HarvesterState.IDLE
+		harvester_state = GlobalEnums.HarvesterState.IDLE
 		return
 	
 	collection_timer += delta
@@ -129,9 +120,9 @@ func handle_spice_unloading(delta):
 			# Finished unloading, return to spice collection
 			if target_spice_deposit and is_instance_valid(target_spice_deposit) and target_spice_deposit.remaining_spice > 0:
 				move_to(target_spice_deposit.global_position)
-				harvester_state = HarvesterState.RETURNING_TO_SPICE
+				harvester_state = GlobalEnums.HarvesterState.RETURNING_TO_SPICE
 			else:
-				harvester_state = HarvesterState.IDLE
+				harvester_state = GlobalEnums.HarvesterState.IDLE
 
 func find_spice_deposit():
 	var spice_deposits = get_tree().get_nodes_in_group("spice_deposits")
@@ -148,7 +139,7 @@ func find_spice_deposit():
 	if nearest_deposit:
 		target_spice_deposit = nearest_deposit
 		move_to(target_spice_deposit.global_position)
-		harvester_state = HarvesterState.MOVING_TO_SPICE
+		harvester_state = GlobalEnums.HarvesterState.MOVING_TO_SPICE
 		print("%s moving to spice deposit" % unit_name)
 
 func find_refinery():
@@ -169,17 +160,17 @@ func find_refinery():
 	if nearest_refinery:
 		target_refinery = nearest_refinery
 		move_to(target_refinery.global_position)
-		harvester_state = HarvesterState.MOVING_TO_REFINERY
+		harvester_state = GlobalEnums.HarvesterState.MOVING_TO_REFINERY
 		print("%s moving to refinery" % unit_name)
 	else:
 		print("No refinery found for %s" % unit_name)
-		harvester_state = HarvesterState.IDLE
+		harvester_state = GlobalEnums.HarvesterState.IDLE
 
 func get_harvester_info() -> Dictionary:
 	var info = get_unit_info()
 	info["spice_carried"] = current_spice
 	info["spice_capacity"] = spice_capacity
-	info["state"] = HarvesterState.keys()[harvester_state]
+	info["state"] = GlobalEnums.HarvesterState.keys()[harvester_state]
 	return info
 
 # Override attack behavior - harvesters don't attack
