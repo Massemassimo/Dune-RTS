@@ -1,0 +1,119 @@
+[gd_scene load_steps=7 format=3 uid="uid://b4kxmjnqrmq8w"]
+
+[ext_resource type="Script" path="res://scripts/GameManager.gd" id="1_0k8xw"]
+[ext_resource type="Script" path="res://scripts/InputManager.gd" id="2_5n7j8"]
+[ext_resource type="Script" path="res://scripts/SpiceDeposit.gd" id="3_r4jv9"]
+[ext_resource type="Script" path="res://scripts/UIManager.gd" id="4_ui_manager"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 25.0
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" type="Node2D" parent="." groups=["game_manager"]]
+script = ExtResource("1_0k8xw")
+
+[node name="InputManager" type="Node" parent="."]
+script = ExtResource("2_5n7j8")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("4_ui_manager")
+
+[node name="ResourceDisplay" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -50.0
+offset_right = 300.0
+offset_bottom = -10.0
+
+[node name="SpiceLabel" type="Label" parent="UI/ResourceDisplay"]
+layout_mode = 0
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -12.0
+offset_right = -10.0
+offset_bottom = 12.0
+text = "Spice: 1000"
+horizontal_alignment = 2
+
+[node name="SpiceIcon" type="ColorRect" parent="UI/ResourceDisplay"]
+layout_mode = 0
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 10.0
+color = Color(0.8, 0.4, 0.1, 1)
+
+[node name="SelectionInfo" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -150.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="SelectionPanel" type="Panel" parent="UI/SelectionInfo"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="SelectionLabel" type="Label" parent="UI/SelectionInfo/SelectionPanel"]
+layout_mode = 0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -10.0
+text = "No selection"
+
+[node name="Environment" type="Node" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = SubResource("Environment_1")
+
+[node name="SpiceDeposits" type="Node2D" parent="."]
+
+[node name="SpiceDeposit1" type="Area2D" parent="SpiceDeposits"]
+position = Vector2(300, 500)
+script = ExtResource("3_r4jv9")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpiceDeposits/SpiceDeposit1"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="SpiceDeposit2" type="Area2D" parent="SpiceDeposits"]
+position = Vector2(800, 300)
+script = ExtResource("3_r4jv9")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpiceDeposits/SpiceDeposit2"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="SpiceDeposit3" type="Area2D" parent="SpiceDeposits"]
+position = Vector2(1200, 600)
+script = ExtResource("3_r4jv9")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpiceDeposits/SpiceDeposit3"]
+shape = SubResource("CircleShape2D_1")
