@@ -6,7 +6,7 @@ class_name UIManager
 @onready var selection_label: Label = $SelectionInfo/SelectionPanel/SelectionLabel
 
 # Game references
-var game_manager: GameManager
+var game_manager
 
 func _ready():
 	game_manager = get_tree().get_first_node_in_group("game_manager")
@@ -19,10 +19,10 @@ func _on_spice_changed(new_amount: int):
 	if spice_label:
 		spice_label.text = "Spice: %d" % new_amount
 
-func _on_unit_selected(unit: Unit):
+func _on_unit_selected(unit):
 	update_selection_display()
 
-func _on_unit_deselected(unit: Unit):
+func _on_unit_deselected(unit):
 	update_selection_display()
 
 func update_selection_display():

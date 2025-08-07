@@ -2,9 +2,9 @@ extends CharacterBody2D
 class_name Unit
 
 # Unit signals
-signal unit_died(unit: Unit)
+signal unit_died(unit)
 signal spice_collected(amount: int, faction: GlobalEnums.Faction)
-signal unit_attacked(attacker: Unit, target: Unit)
+signal unit_attacked(attacker, target)
 
 # Unit properties
 @export var unit_name: String = "Unit"
@@ -28,7 +28,7 @@ var movement_path: Array[Vector2] = []
 var path_index: int = 0
 
 # Combat
-var attack_target: Unit = null
+var attack_target = null
 var last_attack_time: float = 0.0
 var attack_cooldown: float = 1.5
 
@@ -154,12 +154,12 @@ func perform_ai_behavior():
 	if nearest_enemy:
 		attack_unit(nearest_enemy)
 
-func find_nearest_enemy() -> Unit:
+func find_nearest_enemy():
 	var game_manager = get_tree().get_first_node_in_group("game_manager")
 	if not game_manager:
 		return null
 	
-	var nearest: Unit = null
+	var nearest = null
 	var nearest_distance: float = INF
 	
 	for unit in game_manager.all_units:
@@ -177,7 +177,7 @@ func move_to(target: Vector2):
 	path_index = 0
 	target_position = target
 
-func attack_unit(target: Unit):
+func attack_unit(target):
 	if target and is_instance_valid(target):
 		attack_target = target
 		is_attacking = true

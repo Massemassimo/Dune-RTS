@@ -3,8 +3,8 @@ class_name GameManager
 
 # Signals for game events
 signal spice_changed(new_amount: int)
-signal unit_selected(unit: Unit)
-signal unit_deselected(unit: Unit)
+signal unit_selected(unit)
+signal unit_deselected(unit)
 signal game_state_changed(new_state: GlobalEnums.GameState)
 
 # Game state
@@ -17,9 +17,9 @@ var player_spice: int = 1000
 var ai_spice: int = 1000
 
 # Unit management
-var selected_units: Array[Unit] = []
-var all_units: Array[Unit] = []
-var all_buildings: Array[Building] = []
+var selected_units: Array = []
+var all_units: Array = []
+var all_buildings: Array = []
 
 # References to key nodes
 var camera: Camera2D
@@ -80,21 +80,21 @@ func spawn_test_units():
 		get_parent().add_child(refinery)
 		register_building(refinery)
 
-func register_unit(unit: Unit):
+func register_unit(unit):
 	all_units.append(unit)
 	unit.unit_died.connect(_on_unit_died)
 	unit.spice_collected.connect(_on_spice_collected)
 
-func register_building(building: Building):
+func register_building(building):
 	all_buildings.append(building)
 	building.building_destroyed.connect(_on_building_destroyed)
 
-func _on_unit_died(unit: Unit):
+func _on_unit_died(unit):
 	if unit in selected_units:
 		deselect_unit(unit)
 	all_units.erase(unit)
 
-func _on_building_destroyed(building: Building):
+func _on_building_destroyed(building):
 	all_buildings.erase(building)
 
 func _on_spice_collected(amount: int, faction: GlobalEnums.Faction):
@@ -103,13 +103,13 @@ func _on_spice_collected(amount: int, faction: GlobalEnums.Faction):
 	elif faction == ai_faction:
 		ai_spice += amount
 
-func select_unit(unit: Unit):
+func select_unit(unit):
 	if unit not in selected_units:
 		selected_units.append(unit)
 		unit.set_selected(true)
 		unit_selected.emit(unit)
 
-func deselect_unit(unit: Unit):
+func deselect_unit(unit):
 	if unit in selected_units:
 		selected_units.erase(unit)
 		unit.set_selected(false)

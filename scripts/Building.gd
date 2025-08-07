@@ -2,9 +2,9 @@ extends StaticBody2D
 class_name Building
 
 # Building signals
-signal building_destroyed(building: Building)
-signal unit_produced(unit: Unit)
-signal construction_complete(building: Building)
+signal building_destroyed(building)
+signal unit_produced(unit)
+signal construction_complete(building)
 
 # Building properties
 @export var building_name: String = "Building"
@@ -193,7 +193,7 @@ func complete_production():
 	if production_queue.size() > 0:
 		start_next_production()
 
-func create_unit(unit_type: String, spawn_pos: Vector2) -> Unit:
+func create_unit(unit_type: String, spawn_pos: Vector2):
 	var unit_scene_path = "res://scenes/units/%s.tscn" % unit_type
 	var unit_scene = load(unit_scene_path)
 	

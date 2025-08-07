@@ -138,9 +138,9 @@ func create_explosion_effect(pos: Vector2):
 		if unit.faction != faction:
 			unit.take_damage(attack_damage * 0.3)  # Splash damage
 
-func find_units_in_range(center: Vector2, range: float) -> Array[Unit]:
+func find_units_in_range(center: Vector2, range: float) -> Array:
 	var game_manager = get_tree().get_first_node_in_group("game_manager")
-	var units_in_range: Array[Unit] = []
+	var units_in_range: Array = []
 	
 	if game_manager:
 		for unit in game_manager.all_units:

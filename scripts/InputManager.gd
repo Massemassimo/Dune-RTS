@@ -16,7 +16,7 @@ var camera_move_speed: float = 300.0
 var camera_edge_threshold: float = 20.0
 
 # References
-var game_manager: GameManager
+var game_manager
 var camera: Camera2D
 
 func _ready():
@@ -91,7 +91,7 @@ func handle_right_click(world_pos: Vector2, event: InputEventMouseButton):
 func handle_left_release(world_pos: Vector2, event: InputEventMouseButton):
 	is_dragging = false
 
-func handle_unit_selection(unit: Unit, event: InputEventMouseButton):
+func handle_unit_selection(unit, event: InputEventMouseButton):
 	if unit.faction != game_manager.player_faction:
 		return  # Can't select enemy units
 	
@@ -106,7 +106,7 @@ func handle_unit_selection(unit: Unit, event: InputEventMouseButton):
 		game_manager.deselect_all_units()
 		game_manager.select_unit(unit)
 
-func handle_building_selection(building: Building, event: InputEventMouseButton):
+func handle_building_selection(building, event: InputEventMouseButton):
 	if building.faction != game_manager.player_faction:
 		return  # Can't select enemy buildings
 	

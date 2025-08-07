@@ -9,7 +9,7 @@ class_name Harvester
 # Harvester state
 var current_spice: int = 0
 var target_spice_deposit: SpiceDeposit = null
-var target_refinery: Building = null
+var target_refinery = null
 var harvester_state: GlobalEnums.HarvesterState = GlobalEnums.HarvesterState.IDLE
 
 # Collection timer
@@ -147,7 +147,7 @@ func find_refinery():
 	if not game_manager:
 		return
 	
-	var nearest_refinery: Building = null
+	var nearest_refinery = null
 	var nearest_distance: float = INF
 	
 	for building in game_manager.all_buildings:
@@ -174,7 +174,7 @@ func get_harvester_info() -> Dictionary:
 	return info
 
 # Override attack behavior - harvesters don't attack
-func attack_unit(target: Unit):
+func attack_unit(target):
 	pass
 
 func perform_attack():
