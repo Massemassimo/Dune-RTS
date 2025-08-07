@@ -17,7 +17,7 @@ var collection_timer: float = 0.0
 var collection_interval: float = 1.0
 
 func _ready():
-	super._ready()
+	super()
 	unit_name = "Harvester"
 	max_health = 120.0
 	current_health = max_health
@@ -55,7 +55,7 @@ func setup_harvester_visuals():
 	add_child(sprite)
 
 func _process(delta):
-	super._process(delta)
+	super(delta)
 	handle_harvester_behavior(delta)
 
 func handle_harvester_behavior(delta):
