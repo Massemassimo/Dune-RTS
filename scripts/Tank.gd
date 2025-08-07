@@ -5,7 +5,7 @@ class_name Tank
 @export var tank_type: String = "Light"
 
 func _ready():
-	super()
+	super._ready()
 	setup_tank_properties()
 	setup_tank_visuals()
 
@@ -100,7 +100,7 @@ func perform_attack():
 	if not attack_target or not is_instance_valid(attack_target):
 		return
 	
-	super()
+	super.perform_attack()
 	
 	# Special attack effects based on tank type
 	match tank_type:
