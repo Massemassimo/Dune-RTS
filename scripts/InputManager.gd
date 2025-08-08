@@ -2,9 +2,7 @@ extends Node
 class_name InputManager
 
 # Input handling for the game
-signal unit_selection_requested(screen_position: Vector2)
-signal unit_move_requested(target_position: Vector2)
-signal camera_move_requested(direction: Vector2)
+# Unused signals - kept for future functionality
 
 # Mouse state
 var mouse_position: Vector2
@@ -28,7 +26,6 @@ func set_camera(cam: Camera2D):
 
 func _process(delta):
 	handle_camera_movement(delta)
-	handle_mouse_input()
 
 func _input(event):
 	if event is InputEventMouseButton:
@@ -70,7 +67,7 @@ func handle_left_click(world_pos: Vector2, event: InputEventMouseButton):
 		if not event.ctrl_pressed:
 			game_manager.deselect_all_units()
 
-func handle_right_click(world_pos: Vector2, event: InputEventMouseButton):
+func handle_right_click(world_pos: Vector2, _event: InputEventMouseButton):
 	# Right click = move or attack command
 	if game_manager.selected_units.size() > 0:
 		var target_object = get_object_at_position(world_pos)
@@ -88,7 +85,7 @@ func handle_right_click(world_pos: Vector2, event: InputEventMouseButton):
 		game_manager.move_selected_units(world_pos)
 		print("Move command issued to position: ", world_pos)
 
-func handle_left_release(world_pos: Vector2, event: InputEventMouseButton):
+func handle_left_release(_world_pos: Vector2, _event: InputEventMouseButton):
 	is_dragging = false
 
 func handle_unit_selection(unit, event: InputEventMouseButton):
@@ -106,7 +103,7 @@ func handle_unit_selection(unit, event: InputEventMouseButton):
 		game_manager.deselect_all_units()
 		game_manager.select_unit(unit)
 
-func handle_building_selection(building, event: InputEventMouseButton):
+func handle_building_selection(building, _event: InputEventMouseButton):
 	if building.faction != game_manager.player_faction:
 		return  # Can't select enemy buildings
 	
@@ -163,10 +160,10 @@ func get_world_mouse_position() -> Vector2:
 	if camera:
 		return camera.get_global_mouse_position()
 	else:
-		return get_global_mouse_position()
+		return get_viewport().get_global_mouse_position()
 
 func get_object_at_position(world_pos: Vector2):
-	var space_state = get_world_2d().direct_space_state
+	var space_state = get_viewport().get_world_2d().direct_space_state
 	var query = PhysicsPointQueryParameters2D.new()
 	query.position = world_pos
 	query.collision_mask = 1 | 2  # Units and buildings

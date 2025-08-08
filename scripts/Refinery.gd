@@ -34,7 +34,7 @@ func process_spice(raw_spice: int) -> int:
 	
 	return processed
 
-func can_produce_unit(unit_type: String) -> bool:
+func can_produce_unit(_unit_type: String) -> bool:
 	# Refineries don't produce units
 	return false
 

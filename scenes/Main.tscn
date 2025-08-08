@@ -99,21 +99,21 @@ environment = SubResource("Environment_1")
 
 [node name="SpiceDeposits" type="Node2D" parent="."]
 
-[node name="SpiceDeposit1" type="Area2D" parent="SpiceDeposits"]
+[node name="SpiceDeposit1" type="StaticBody2D" parent="SpiceDeposits"]
 position = Vector2(300, 500)
 script = ExtResource("3_r4jv9")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SpiceDeposits/SpiceDeposit1"]
 shape = SubResource("CircleShape2D_1")
 
-[node name="SpiceDeposit2" type="Area2D" parent="SpiceDeposits"]
+[node name="SpiceDeposit2" type="StaticBody2D" parent="SpiceDeposits"]
 position = Vector2(800, 300)
 script = ExtResource("3_r4jv9")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SpiceDeposits/SpiceDeposit2"]
 shape = SubResource("CircleShape2D_1")
 
-[node name="SpiceDeposit3" type="Area2D" parent="SpiceDeposits"]
+[node name="SpiceDeposit3" type="StaticBody2D" parent="SpiceDeposits"]
 position = Vector2(1200, 600)
 script = ExtResource("3_r4jv9")
 

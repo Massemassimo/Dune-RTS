@@ -1,4 +1,4 @@
-extends Unit
+extends "res://scripts/Unit.gd"
 class_name Tank
 
 @export var tank_type: String = "Light"
@@ -22,24 +22,54 @@ func setup_tank_visuals():
 		sprite.queue_free()
 	
 	sprite = Sprite2D.new()
-	var texture = ImageTexture.new()
-	var image = Image.create(36, 24, false, Image.FORMAT_RGB8)
-	
-	var color: Color
-	match faction:
-		GlobalEnums.Faction.ATREIDES:
-			color = Color(0.3, 0.5, 0.9)
-		GlobalEnums.Faction.HARKONNEN:
-			color = Color(0.9, 0.3, 0.3)
-		GlobalEnums.Faction.ORDOS:
-			color = Color(0.3, 0.9, 0.3)
-		_:
-			color = Color.GRAY
-	
-	image.fill(color)
-	texture.set_image(image)
+	var texture = create_tank_texture()
 	sprite.texture = texture
 	add_child(sprite)
+
+func create_tank_texture() -> ImageTexture:
+	# Create tank-specific visual (with turret and tracks)
+	var texture = ImageTexture.new()
+	var image = Image.create(36, 24, false, Image.FORMAT_RGBA8)
+	
+	var primary_color = get_faction_color()
+	var dark_color = primary_color.darkened(0.5)
+	var light_color = primary_color.lightened(0.2)
+	var metal_color = Color(0.6, 0.6, 0.6)
+	
+	# Fill background
+	image.fill(Color.TRANSPARENT)
+	
+	# Draw tank body (main hull)
+	for y in range(6, 18):
+		for x in range(4, 32):
+			var edge_dist = min(min(x-4, 32-x), min(y-6, 18-y))
+			if edge_dist >= 0:
+				if edge_dist < 1:
+					image.set_pixel(x, y, dark_color)  # Border
+				else:
+					image.set_pixel(x, y, primary_color)  # Fill
+	
+	# Draw turret
+	for y in range(8, 16):
+		for x in range(12, 28):
+			if (x-20)*(x-20) + (y-12)*(y-12) < 25:  # Circular turret
+				image.set_pixel(x, y, primary_color.darkened(0.2))
+	
+	# Draw cannon
+	for y in range(11, 13):
+		for x in range(28, 34):
+			image.set_pixel(x, y, dark_color)
+	
+	# Add tracks
+	for y in range(4, 6):  # Top track
+		for x in range(4, 32):
+			image.set_pixel(x, y, metal_color)
+	for y in range(18, 20):  # Bottom track  
+		for x in range(4, 32):
+			image.set_pixel(x, y, metal_color)
+	
+	texture.set_image(image)
+	return texture
 
 func perform_attack():
 	if not attack_target or not is_instance_valid(attack_target):

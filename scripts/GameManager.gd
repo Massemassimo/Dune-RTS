@@ -23,7 +23,7 @@ var all_buildings: Array = []
 
 # References to key nodes
 var camera: Camera2D
-var ui_manager: Control
+var ui_manager: CanvasLayer
 var input_manager: InputManager
 
 # Game settings
@@ -31,35 +31,44 @@ const SPICE_COLLECTION_RATE: int = 25
 const STARTING_SPICE: int = 1000
 
 func _ready():
-	print("Dune RTS - Game Manager initialized")
+	# Game Manager initialized
 	setup_game()
+
+# Game loop processing can be added here if needed
+# func _process(_delta):
+#	pass
 
 func setup_game():
 	# Initialize game systems
 	current_state = GlobalEnums.GameState.PLAYING
-	player_spice = GlobalEnums.STARTING_SPICE
-	ai_spice = GlobalEnums.STARTING_SPICE
+	player_spice = STARTING_SPICE
+	ai_spice = STARTING_SPICE
 	
 	# Find key nodes
-	camera = get_node_or_null("Camera2D")
-	ui_manager = get_node_or_null("UI")
-	input_manager = get_node_or_null("InputManager")
+	camera = get_node_or_null("../Camera2D")
+	ui_manager = get_node_or_null("../UI")
+	input_manager = get_node_or_null("../InputManager")
 	
-	# Connect signals
-	spice_changed.connect(_on_spice_changed)
+	# Connect signals (spice_changed is handled directly by UI)
 	game_state_changed.emit(current_state)
+	
+	# Setup input manager
+	if input_manager and camera:
+		input_manager.set_camera(camera)
 	
 	# Spawn initial units for testing
 	spawn_test_units()
 
 func spawn_test_units():
+	# Spawn initial units for testing
+	
 	# Spawn a test harvester for the player
 	var harvester_scene = preload("res://scenes/units/Harvester.tscn")
 	if harvester_scene:
 		var harvester = harvester_scene.instantiate()
 		harvester.position = Vector2(200, 200)
 		harvester.faction = player_faction
-		get_parent().add_child(harvester)
+		get_parent().add_child.call_deferred(harvester)
 		register_unit(harvester)
 	
 	# Spawn a test tank
@@ -68,7 +77,7 @@ func spawn_test_units():
 		var tank = tank_scene.instantiate()
 		tank.position = Vector2(300, 200)
 		tank.faction = player_faction
-		get_parent().add_child(tank)
+		get_parent().add_child.call_deferred(tank)
 		register_unit(tank)
 	
 	# Spawn a refinery
@@ -77,13 +86,16 @@ func spawn_test_units():
 		var refinery = refinery_scene.instantiate()
 		refinery.position = Vector2(150, 300)
 		refinery.faction = player_faction
-		get_parent().add_child(refinery)
+		get_parent().add_child.call_deferred(refinery)
 		register_building(refinery)
 
 func register_unit(unit):
 	all_units.append(unit)
 	unit.unit_died.connect(_on_unit_died)
-	unit.spice_collected.connect(_on_spice_collected)
+	
+	# Only Harvesters have spice_collected signal
+	if unit is Harvester:
+		unit.spice_collected.connect(_on_spice_collected)
 
 func register_building(building):
 	all_buildings.append(building)
@@ -135,8 +147,7 @@ func spend_spice(amount: int) -> bool:
 		return true
 	return false
 
-func _on_spice_changed(new_amount: int):
-	print("Player spice: ", new_amount)
+# spice_changed signal is handled directly by UIManager
 
 func get_player_spice() -> int:
 	return player_spice

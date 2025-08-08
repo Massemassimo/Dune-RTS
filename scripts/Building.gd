@@ -169,7 +169,7 @@ func start_next_production():
 
 func complete_production():
 	var unit_type = current_production["type"]
-	var unit_data = current_production["data"]
+	var _unit_data = current_production["data"]
 	
 	# Spawn the unit near the building
 	var spawn_position = find_spawn_position()
@@ -284,12 +284,12 @@ func get_building_info() -> Dictionary:
 		"current_production": current_production.get("type", "")
 	}
 
-func can_produce_unit(unit_type: String) -> bool:
+func can_produce_unit(_unit_type: String) -> bool:
 	# Override in specific buildings to define what they can produce
 	return false
 
 # Input handling for selection
-func _input_event(viewport: Viewport, event: InputEvent, shape_idx: int):
+func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int):
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			var game_manager = get_tree().get_first_node_in_group("game_manager")

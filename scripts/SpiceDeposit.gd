@@ -1,4 +1,4 @@
-extends Area2D
+extends StaticBody2D
 class_name SpiceDeposit
 
 # Spice deposit properties
@@ -12,12 +12,17 @@ var label: Label
 
 # Regeneration timer
 var regen_timer: float = 0.0
+var initial_position: Vector2
 
 func _ready():
 	add_to_group("spice_deposits")
 	remaining_spice = max_spice
+	initial_position = global_position
 	setup_visuals()
 	setup_collision()
+	
+	# Enable transform notifications for position locking
+	set_notify_transform(true)
 
 func setup_visuals():
 	# Create spice sprite (orange/brown deposit)
@@ -37,11 +42,14 @@ func setup_visuals():
 	add_child(label)
 
 func setup_collision():
-	var collision = CollisionShape2D.new()
-	var shape = CircleShape2D.new()
-	shape.radius = 25
-	collision.shape = shape
-	add_child(collision)
+	# Check if collision shape already exists (from scene)
+	var existing_collision = get_node_or_null("CollisionShape2D")
+	if not existing_collision:
+		var collision = CollisionShape2D.new()
+		var shape = CircleShape2D.new()
+		shape.radius = 25
+		collision.shape = shape
+		add_child(collision)
 	
 	collision_layer = 8  # Spice layer
 	collision_mask = 0   # Spice doesn't collide with anything
@@ -49,6 +57,7 @@ func setup_collision():
 func _process(delta):
 	handle_regeneration(delta)
 	update_visuals()
+
 
 func handle_regeneration(delta):
 	if regeneration_rate > 0 and remaining_spice < max_spice:
