@@ -1,14 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://cj5tk7w8qn4r5"]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" uid="uid://cksgpooecjkpu" path="res://scripts/Refinery.gd" id="1_3m8d7"]
+[ext_resource type="Script" path="res://scripts/Barracks.gd" id="1_barracks"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(80, 60)
 
-[node name="Refinery" type="StaticBody2D" groups=["refineries"]]
+[node name="Barracks" type="StaticBody2D"]
 collision_layer = 2
 collision_mask = 1
-script = ExtResource("1_3m8d7")
+script = ExtResource("1_barracks")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1")

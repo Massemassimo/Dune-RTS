@@ -97,10 +97,6 @@ func get_faction_color() -> Color:
 		_:
 			return Color(0.5, 0.5, 0.5)  # Gray
 	
-	# Create selection indicator
-	selection_indicator = Node2D.new()
-	add_child(selection_indicator)
-	
 	# Create health bar
 	health_bar = ProgressBar.new()
 	health_bar.size = Vector2(40, 8)

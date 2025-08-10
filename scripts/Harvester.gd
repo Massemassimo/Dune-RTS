@@ -13,6 +13,13 @@ var target_refinery = null
 var harvester_state: GlobalEnums.HarvesterState = GlobalEnums.HarvesterState.IDLE
 var collection_timer: float = 0.0
 var collection_interval: float = 1.0
+var unload_timer: float = 0.0
+var base_unload_time: float = 5.0
+var was_manually_moved: bool = false
+var is_frozen_for_unloading: bool = false
+var waiting_for_refinery: bool = false
+var spice_to_unload: int = 0
+var spice_unloaded_so_far: int = 0
 
 func _ready():
 	# Harvester initialization
@@ -76,33 +83,60 @@ func create_harvester_texture() -> ImageTexture:
 	return texture
 
 func _process(delta):
-	super(delta)
-	
-	# Harvester operating normally
+	# Don't process movement if frozen for unloading
+	if not is_frozen_for_unloading:
+		super(delta)
 	
 	handle_harvester_behavior(delta)
 
 func handle_harvester_behavior(delta):
 	match harvester_state:
 		GlobalEnums.HarvesterState.IDLE:
-			find_spice_deposit()
+			if current_spice > 0:
+				find_refinery()
+			else:
+				find_spice_deposit()
 		GlobalEnums.HarvesterState.MOVING_TO_SPICE:
 			check_arrival_at_deposit()
 		GlobalEnums.HarvesterState.COLLECTING_SPICE:
 			handle_spice_collection(delta)
+		GlobalEnums.HarvesterState.MOVING_TO_REFINERY:
+			check_arrival_at_refinery()
+		GlobalEnums.HarvesterState.UNLOADING_SPICE:
+			handle_unloading(delta)
 
 func handle_spice_collection(delta):
+	# Check if we've been manually moved away from the deposit
+	if was_manually_moved:
+		harvester_state = GlobalEnums.HarvesterState.IDLE
+		was_manually_moved = false
+		return
+	
 	if not target_spice_deposit or not is_instance_valid(target_spice_deposit):
 		harvester_state = GlobalEnums.HarvesterState.IDLE
+		return
+	
+	# Check if we're still close enough to the deposit
+	var distance = global_position.distance_to(target_spice_deposit.global_position)
+	if distance > collection_range:
+		harvester_state = GlobalEnums.HarvesterState.IDLE
+		return
+	
+	# Check if we're at full capacity
+	if current_spice >= spice_capacity:
+		find_refinery()
 		return
 	
 	collection_timer += delta
 	if collection_timer >= collection_interval:
 		collection_timer = 0.0
 		var collected = target_spice_deposit.collect_spice(collection_rate)
-		current_spice += collected
-		spice_collected.emit(collected, faction)
-		# Spice collected successfully
+		current_spice = min(current_spice + collected, spice_capacity)
+		# Don't emit spice_collected - spice only increases when unloading
+		
+		# Check again if we're now full
+		if current_spice >= spice_capacity:
+			find_refinery()
 
 func find_spice_deposit():
 	# Searching for spice deposits
@@ -137,6 +171,134 @@ func check_arrival_at_deposit():
 	var distance = global_position.distance_to(target_spice_deposit.global_position)
 	if distance <= collection_range:
 		harvester_state = GlobalEnums.HarvesterState.COLLECTING_SPICE
+
+func find_refinery():
+	var refineries = get_tree().get_nodes_in_group("refineries")
+	var nearest_refinery = null
+	var nearest_distance: float = INF
+	
+	for refinery in refineries:
+		if refinery.faction == faction:
+			var distance = global_position.distance_to(refinery.global_position)
+			if distance < nearest_distance:
+				nearest_distance = distance
+				nearest_refinery = refinery
+	
+	if nearest_refinery:
+		target_refinery = nearest_refinery
+		move_to(target_refinery.global_position)
+		harvester_state = GlobalEnums.HarvesterState.MOVING_TO_REFINERY
+
+func check_arrival_at_refinery():
+	if not target_refinery or not is_instance_valid(target_refinery):
+		harvester_state = GlobalEnums.HarvesterState.IDLE
+		return
+	
+	var distance = global_position.distance_to(target_refinery.global_position)
+	if distance <= 80.0:  # Close enough to refinery
+		# Try to get an unload slot
+		if target_refinery.request_unload_slot(self):
+			# Slot available immediately
+			start_unloading()
+		else:
+			# Added to queue, wait
+			waiting_for_refinery = true
+			is_frozen_for_unloading = true
+			movement_path.clear()
+			is_moving = false
+
+func start_unloading():
+	harvester_state = GlobalEnums.HarvesterState.UNLOADING_SPICE
+	unload_timer = 0.0
+	movement_path.clear()
+	is_moving = false
+	is_frozen_for_unloading = true
+	waiting_for_refinery = false
+	spice_to_unload = current_spice
+	spice_unloaded_so_far = 0
+
+func start_unloading_at_refinery():
+	# Called by refinery when slot becomes available
+	if current_spice > 0:
+		start_unloading()
+
+func handle_unloading(delta):
+	if spice_to_unload <= 0:
+		finish_unloading()
+		return
+	
+	# Calculate unload time based on spice amount (50% full = 50% time)
+	var spice_percentage = float(spice_to_unload) / float(spice_capacity)
+	var required_unload_time = base_unload_time * spice_percentage
+	
+	unload_timer += delta
+	
+	# Calculate how much spice should have been unloaded by now
+	var progress_percentage = min(unload_timer / required_unload_time, 1.0)
+	var target_unloaded = int(progress_percentage * spice_to_unload)
+	
+	# Add the difference to game manager
+	var spice_to_add_now = target_unloaded - spice_unloaded_so_far
+	if spice_to_add_now > 0:
+		var game_manager = get_tree().get_first_node_in_group("game_manager")
+		if game_manager:
+			game_manager.add_spice(spice_to_add_now)
+		spice_unloaded_so_far += spice_to_add_now
+	
+	if unload_timer >= required_unload_time:
+		# Unload complete - ensure all spice is added
+		var remaining = spice_to_unload - spice_unloaded_so_far
+		if remaining > 0:
+			var game_manager = get_tree().get_first_node_in_group("game_manager")
+			if game_manager:
+				game_manager.add_spice(remaining)
+		
+		current_spice = 0
+		finish_unloading()
+
+func finish_unloading():
+	# Release the refinery slot
+	if target_refinery and is_instance_valid(target_refinery):
+		target_refinery.release_unload_slot(self)
+	
+	# Unfreeze and reset state
+	is_frozen_for_unloading = false
+	waiting_for_refinery = false
+	harvester_state = GlobalEnums.HarvesterState.IDLE
+	
+	# Automatically find next spice deposit
+	find_spice_deposit()
+
+# Override move_to to detect manual movement
+func move_to(target: Vector2):
+	# If we're currently collecting and get a move command, mark as manually moved
+	if harvester_state == GlobalEnums.HarvesterState.COLLECTING_SPICE:
+		was_manually_moved = true
+	
+	# Check if we're being manually directed to a refinery
+	var clicked_refinery = get_refinery_at_position(target)
+	if clicked_refinery and current_spice > 0:
+		target_refinery = clicked_refinery
+		harvester_state = GlobalEnums.HarvesterState.MOVING_TO_REFINERY
+	
+	# Unfreeze if manually moved
+	if is_frozen_for_unloading or waiting_for_refinery:
+		is_frozen_for_unloading = false
+		waiting_for_refinery = false
+		if target_refinery:
+			target_refinery.release_unload_slot(self)
+	
+	super.move_to(target)
+
+func get_refinery_at_position(pos: Vector2):
+	# Check if the target position is close to a refinery
+	var refineries = get_tree().get_nodes_in_group("refineries")
+	for refinery in refineries:
+		if refinery.faction == faction:
+			var distance = pos.distance_to(refinery.global_position)
+			if distance <= 100.0:  # Close enough to be considered targeting the refinery
+				return refinery
+	return null
 
 func attack_unit(_target):
 	pass

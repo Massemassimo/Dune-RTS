@@ -7,6 +7,8 @@ class_name Refinery
 
 # Refinery state
 var stored_spice: int = 0
+var unloading_harvester = null
+var harvester_queue: Array = []
 
 func _ready():
 	super._ready()
@@ -38,8 +40,34 @@ func can_produce_unit(_unit_type: String) -> bool:
 	# Refineries don't produce units
 	return false
 
+func request_unload_slot(harvester) -> bool:
+	if unloading_harvester == null:
+		# Slot available immediately
+		unloading_harvester = harvester
+		return true
+	else:
+		# Add to queue
+		if harvester not in harvester_queue:
+			harvester_queue.append(harvester)
+		return false
+
+func release_unload_slot(harvester):
+	if unloading_harvester == harvester:
+		unloading_harvester = null
+		
+		# Check if there's a harvester waiting in queue
+		if harvester_queue.size() > 0:
+			var next_harvester = harvester_queue.pop_front()
+			if is_instance_valid(next_harvester):
+				unloading_harvester = next_harvester
+				next_harvester.start_unloading_at_refinery()
+
+func is_unload_slot_available() -> bool:
+	return unloading_harvester == null
+
 func get_refinery_info() -> Dictionary:
 	var info = get_building_info()
 	info["stored_spice"] = stored_spice
 	info["processing_capacity"] = processing_capacity
+	info["queue_size"] = harvester_queue.size()
 	return info

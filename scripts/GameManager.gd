@@ -18,6 +18,7 @@ var ai_spice: int = 1000
 
 # Unit management
 var selected_units: Array = []
+var selected_building = null
 var all_units: Array = []
 var all_buildings: Array = []
 
@@ -88,6 +89,15 @@ func spawn_test_units():
 		refinery.faction = player_faction
 		get_parent().add_child.call_deferred(refinery)
 		register_building(refinery)
+	
+	# Spawn a barracks for unit production
+	var barracks_scene = preload("res://scenes/buildings/Barracks.tscn")
+	if barracks_scene:
+		var barracks = barracks_scene.instantiate()
+		barracks.position = Vector2(400, 300)
+		barracks.faction = player_faction
+		get_parent().add_child.call_deferred(barracks)
+		register_building(barracks)
 
 func register_unit(unit):
 	all_units.append(unit)
@@ -117,6 +127,8 @@ func _on_spice_collected(amount: int, faction: GlobalEnums.Faction):
 
 func select_unit(unit):
 	if unit not in selected_units:
+		# Deselect any building when selecting units
+		deselect_building()
 		selected_units.append(unit)
 		unit.set_selected(true)
 		unit_selected.emit(unit)
@@ -131,6 +143,25 @@ func deselect_all_units():
 	for unit in selected_units:
 		unit.set_selected(false)
 	selected_units.clear()
+
+func select_building(building):
+	deselect_all_units()
+	deselect_building() # Deselect any previously selected building
+	selected_building = building
+	building.set_selected(true)
+	
+	# Tell UI about building selection
+	var local_ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if local_ui_manager:
+		local_ui_manager.select_building(building)
+
+func deselect_building():
+	if selected_building:
+		selected_building.set_selected(false)
+		selected_building = null
+		var local_ui_manager = get_tree().get_first_node_in_group("ui_manager")
+		if local_ui_manager:
+			local_ui_manager.deselect_building()
 
 func move_selected_units(target_position: Vector2):
 	for unit in selected_units:

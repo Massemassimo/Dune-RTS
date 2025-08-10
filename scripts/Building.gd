@@ -288,11 +288,4 @@ func can_produce_unit(_unit_type: String) -> bool:
 	# Override in specific buildings to define what they can produce
 	return false
 
-# Input handling for selection
-func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int):
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			var game_manager = get_tree().get_first_node_in_group("game_manager")
-			if game_manager:
-				# Buildings can be selected but don't deselect units
-				set_selected(true)
+# Input handling is done by InputManager

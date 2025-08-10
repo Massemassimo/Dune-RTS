@@ -28,6 +28,10 @@ func _process(delta):
 	handle_camera_movement(delta)
 
 func _input(event):
+	# Check if the event is consumed by UI first
+	if event is InputEventMouseButton and is_click_on_ui(event.position):
+		return # Let UI handle the event
+	
 	if event is InputEventMouseButton:
 		handle_mouse_click(event)
 	elif event is InputEventMouseMotion:
@@ -66,6 +70,7 @@ func handle_left_click(world_pos: Vector2, event: InputEventMouseButton):
 		# Clicked on empty space
 		if not event.ctrl_pressed:
 			game_manager.deselect_all_units()
+			game_manager.deselect_building()
 
 func handle_right_click(world_pos: Vector2, _event: InputEventMouseButton):
 	# Right click = move or attack command
@@ -107,8 +112,8 @@ func handle_building_selection(building, _event: InputEventMouseButton):
 	if building.faction != game_manager.player_faction:
 		return  # Can't select enemy buildings
 	
-	# Buildings don't replace unit selection, but show building info
-	building.set_selected(true)
+	# Select the building through game manager
+	game_manager.select_building(building)
 	print("Selected building: ", building.building_name)
 
 func handle_mouse_motion(event: InputEventMouseMotion):
@@ -119,6 +124,7 @@ func handle_keyboard_input(event: InputEventKey):
 		match event.keycode:
 			KEY_ESCAPE:
 				game_manager.deselect_all_units()
+				game_manager.deselect_building()
 			KEY_A:
 				select_all_units()
 			KEY_S:
@@ -170,7 +176,7 @@ func get_object_at_position(world_pos: Vector2):
 	
 	var results = space_state.intersect_point(query)
 	if results.size() > 0:
-		return results[0].collider.get_parent()
+		return results[0].collider
 	
 	return null
 
@@ -188,3 +194,32 @@ func stop_selected_units():
 		unit.movement_path.clear()
 		unit.is_moving = false
 		unit.attack_target = null
+
+func is_click_on_ui(screen_pos: Vector2) -> bool:
+	# Check if click is on any UI element
+	var ui_manager = get_tree().get_first_node_in_group("ui_manager")
+	if not ui_manager:
+		return false
+	
+	# Check if production panel is visible and if click is within it
+	var production_panel = ui_manager.get_node_or_null("ProductionPanel")
+	if production_panel and production_panel.visible:
+		var panel_rect = Rect2(production_panel.global_position, production_panel.size)
+		if panel_rect.has_point(screen_pos):
+			return true
+	
+	# Check if click is on selection panel
+	var selection_info = ui_manager.get_node_or_null("SelectionInfo")
+	if selection_info:
+		var selection_rect = Rect2(selection_info.global_position, selection_info.size)
+		if selection_rect.has_point(screen_pos):
+			return true
+	
+	# Check if click is on resource display
+	var resource_display = ui_manager.get_node_or_null("ResourceDisplay")
+	if resource_display:
+		var resource_rect = Rect2(resource_display.global_position, resource_display.size)
+		if resource_rect.has_point(screen_pos):
+			return true
+	
+	return false

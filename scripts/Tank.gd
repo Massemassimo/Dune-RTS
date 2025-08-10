@@ -33,7 +33,7 @@ func create_tank_texture() -> ImageTexture:
 	
 	var primary_color = get_faction_color()
 	var dark_color = primary_color.darkened(0.5)
-	var light_color = primary_color.lightened(0.2)
+	var _light_color = primary_color.lightened(0.2)
 	var metal_color = Color(0.6, 0.6, 0.6)
 	
 	# Fill background
