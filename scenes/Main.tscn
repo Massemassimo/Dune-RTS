@@ -20,45 +20,69 @@ script = ExtResource("1_0k8xw")
 [node name="InputManager" type="Node" parent="."]
 script = ExtResource("2_5n7j8")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." groups=["camera"]]
 position = Vector2(640, 360)
 
 [node name="UI" type="CanvasLayer" parent="." groups=["ui_manager"]]
 script = ExtResource("4_ui_manager")
 
-[node name="ResourceDisplay" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 2
-anchor_top = 1.0
+[node name="ResourceDisplay" type="Panel" parent="UI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="ResourceContainer" type="HBoxContainer" parent="UI/ResourceDisplay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
-offset_top = -50.0
-offset_right = 300.0
-offset_bottom = -10.0
-grow_vertical = 0
-
-[node name="SpiceLabel" type="Label" parent="UI/ResourceDisplay"]
-layout_mode = 0
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -12.0
+offset_top = 10.0
 offset_right = -10.0
-offset_bottom = 12.0
-text = "Spice: 1000"
-horizontal_alignment = 2
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="SpiceIcon" type="ColorRect" parent="UI/ResourceDisplay"]
-layout_mode = 0
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 10.0
-offset_top = -10.0
-offset_right = 30.0
-offset_bottom = 10.0
+[node name="SpiceContainer" type="HBoxContainer" parent="UI/ResourceDisplay/ResourceContainer"]
+layout_mode = 2
+
+[node name="SpiceIcon" type="ColorRect" parent="UI/ResourceDisplay/ResourceContainer/SpiceContainer"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
 color = Color(0.8, 0.4, 0.1, 1)
+
+[node name="SpiceLabel" type="Label" parent="UI/ResourceDisplay/ResourceContainer/SpiceContainer"]
+layout_mode = 2
+text = "Spice: 1000"
+
+[node name="PowerContainer" type="HBoxContainer" parent="UI/ResourceDisplay/ResourceContainer"]
+layout_mode = 2
+
+[node name="PowerIcon" type="ColorRect" parent="UI/ResourceDisplay/ResourceContainer/PowerContainer"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+color = Color(0.8, 0.8, 0.2, 1)
+
+[node name="PowerLabel" type="Label" parent="UI/ResourceDisplay/ResourceContainer/PowerContainer"]
+layout_mode = 2
+text = "Power: 100/100"
+
+[node name="PopulationContainer" type="HBoxContainer" parent="UI/ResourceDisplay/ResourceContainer"]
+layout_mode = 2
+
+[node name="PopulationIcon" type="ColorRect" parent="UI/ResourceDisplay/ResourceContainer/PopulationContainer"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+color = Color(0.2, 0.8, 0.2, 1)
+
+[node name="PopulationLabel" type="Label" parent="UI/ResourceDisplay/ResourceContainer/PopulationContainer"]
+layout_mode = 2
+text = "Units: 5/50"
 
 [node name="SelectionInfo" type="Control" parent="UI"]
 layout_mode = 3
@@ -112,6 +136,80 @@ horizontal_alignment = 1
 
 [node name="ProductionButtons" type="VBoxContainer" parent="UI/ProductionPanel"]
 layout_mode = 2
+
+[node name="CommandPanel" type="Panel" parent="UI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -80.0
+offset_right = 200.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="CommandButtons" type="GridContainer" parent="UI/CommandPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5
+
+[node name="Minimap" type="Panel" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 160.0
+grow_horizontal = 0
+
+[node name="MinimapViewport" type="SubViewport" parent="UI/Minimap"]
+size = Vector2i(140, 140)
+
+[node name="ProductionQueuePanel" type="Panel" parent="UI"]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -100.0
+offset_right = 250.0
+offset_bottom = 100.0
+grow_vertical = 2
+
+[node name="QueueContainer" type="VBoxContainer" parent="UI/ProductionQueuePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="QueueTitle" type="Label" parent="UI/ProductionQueuePanel/QueueContainer"]
+layout_mode = 2
+text = "🏭 PRODUCTION QUEUE"
+horizontal_alignment = 1
+
+[node name="QueueList" type="ScrollContainer" parent="UI/ProductionQueuePanel/QueueContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QueueItems" type="VBoxContainer" parent="UI/ProductionQueuePanel/QueueContainer/QueueList"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Environment" type="Node" parent="."]
 

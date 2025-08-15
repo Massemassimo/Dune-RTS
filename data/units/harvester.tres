@@ -1,0 +1,31 @@
+[gd_resource type="Resource" format=3 load_steps=2]
+
+[ext_resource type="Script" path="res://scripts/data/UnitData.gd" id="1_0"]
+
+[resource]
+script = ExtResource("1_0")
+unit_id = "harvester"
+unit_name = "Harvester"
+description = "Resource collection unit - unarmed but essential"
+unit_type = "ground"
+max_health = 120.0
+armor = 1.0
+move_speed = 80.0
+attack_damage = 0.0
+attack_range = 0.0
+attack_cooldown = 0.0
+sight_range = 150.0
+spice_cost = 300
+build_time = 5.0
+power_required = 1
+population_cost = 1
+abilities = ["harvest_spice"]
+special_properties = {
+	"spice_capacity": 100,
+	"collection_rate": 5,
+	"collection_range": 50.0
+}
+texture_path = "res://textures/units/harvester.png"
+sounds = {}
+required_buildings = ["refinery"]
+required_tech = []

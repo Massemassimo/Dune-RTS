@@ -42,20 +42,19 @@ func setup_harvester_visuals():
 		sprite.queue_free()
 	
 	sprite = Sprite2D.new()
-	var texture = create_harvester_texture()
-	sprite.texture = texture
-	add_child(sprite)
-
-func create_harvester_texture() -> ImageTexture:
-	# Create harvester-specific visual (wider, with spice container)
 	var texture = ImageTexture.new()
 	var image = Image.create(40, 30, false, Image.FORMAT_RGBA8)
-	
 	var primary_color = get_faction_color()
 	var dark_color = primary_color.darkened(0.4)
 	var light_color = primary_color.lightened(0.3)
-	var spice_color = Color(0.9, 0.6, 0.2)  # Orange for spice container
-	
+	var accent_color = Color(0.9, 0.6, 0.2)  # Orange for spice container
+	create_harvester_texture(image, primary_color, dark_color, light_color, accent_color)
+	texture.set_image(image)
+	sprite.texture = texture
+	add_child(sprite)
+
+func create_harvester_texture(image: Image, primary: Color, dark: Color, light: Color, accent: Color):
+	# Create harvester-specific visual (wider, with spice container)
 	# Fill background
 	image.fill(Color.TRANSPARENT)
 	
@@ -65,22 +64,19 @@ func create_harvester_texture() -> ImageTexture:
 			var edge_dist = min(min(x-3, 37-x), min(y-5, 25-y))
 			if edge_dist >= 0:
 				if edge_dist < 1:
-					image.set_pixel(x, y, dark_color)  # Border
+					image.set_pixel(x, y, dark)  # Border
 				else:
-					image.set_pixel(x, y, primary_color)  # Fill
+					image.set_pixel(x, y, primary)  # Fill
 	
 	# Draw spice container (back section)
 	for y in range(8, 22):
 		for x in range(25, 35):
-			image.set_pixel(x, y, spice_color)
+			image.set_pixel(x, y, accent)  # Use accent color for spice container
 	
 	# Add front highlight
 	for y in range(8, 15):
 		for x in range(5, 20):
-			image.set_pixel(x, y, light_color)
-	
-	texture.set_image(image)
-	return texture
+			image.set_pixel(x, y, light)
 
 func _process(delta):
 	# Don't process movement if frozen for unloading

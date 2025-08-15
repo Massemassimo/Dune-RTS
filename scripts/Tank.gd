@@ -22,20 +22,19 @@ func setup_tank_visuals():
 		sprite.queue_free()
 	
 	sprite = Sprite2D.new()
-	var texture = create_tank_texture()
+	var texture = ImageTexture.new()
+	var image = Image.create(36, 24, false, Image.FORMAT_RGBA8)
+	var primary_color = get_faction_color()
+	var dark_color = primary_color.darkened(0.5)
+	var light_color = primary_color.lightened(0.2)
+	var metal_color = Color(0.6, 0.6, 0.6)
+	create_tank_texture(image, primary_color, dark_color, light_color, metal_color)
+	texture.set_image(image)
 	sprite.texture = texture
 	add_child(sprite)
 
-func create_tank_texture() -> ImageTexture:
+func create_tank_texture(image: Image, primary: Color, dark: Color, light: Color, accent: Color):
 	# Create tank-specific visual (with turret and tracks)
-	var texture = ImageTexture.new()
-	var image = Image.create(36, 24, false, Image.FORMAT_RGBA8)
-	
-	var primary_color = get_faction_color()
-	var dark_color = primary_color.darkened(0.5)
-	var _light_color = primary_color.lightened(0.2)
-	var metal_color = Color(0.6, 0.6, 0.6)
-	
 	# Fill background
 	image.fill(Color.TRANSPARENT)
 	
@@ -45,35 +44,31 @@ func create_tank_texture() -> ImageTexture:
 			var edge_dist = min(min(x-4, 32-x), min(y-6, 18-y))
 			if edge_dist >= 0:
 				if edge_dist < 1:
-					image.set_pixel(x, y, dark_color)  # Border
+					image.set_pixel(x, y, dark)  # Border
 				else:
-					image.set_pixel(x, y, primary_color)  # Fill
+					image.set_pixel(x, y, primary)  # Fill
 	
 	# Draw turret
 	for y in range(8, 16):
 		for x in range(12, 28):
 			if (x-20)*(x-20) + (y-12)*(y-12) < 25:  # Circular turret
-				image.set_pixel(x, y, primary_color.darkened(0.2))
+				image.set_pixel(x, y, primary.darkened(0.2))
 	
 	# Draw cannon
 	for y in range(11, 13):
 		for x in range(28, 34):
-			image.set_pixel(x, y, dark_color)
+			image.set_pixel(x, y, dark)
 	
-	# Add tracks
+	# Add tracks using accent color
 	for y in range(4, 6):  # Top track
 		for x in range(4, 32):
-			image.set_pixel(x, y, metal_color)
+			image.set_pixel(x, y, accent)
 	for y in range(18, 20):  # Bottom track  
 		for x in range(4, 32):
-			image.set_pixel(x, y, metal_color)
-	
-	texture.set_image(image)
-	return texture
+			image.set_pixel(x, y, accent)
 
 func perform_attack():
 	if not attack_target or not is_instance_valid(attack_target):
 		return
 	
 	super()
-	print("%s attacks %s" % [unit_name, attack_target.unit_name])

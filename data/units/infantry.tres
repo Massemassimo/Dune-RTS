@@ -1,0 +1,27 @@
+[gd_resource type="Resource" format=3 load_steps=2]
+
+[ext_resource type="Script" path="res://scripts/data/UnitData.gd" id="1_0"]
+
+[resource]
+script = ExtResource("1_0")
+unit_id = "infantry"
+unit_name = "Infantry"
+description = "Light infantry unit - cheap and fast"
+unit_type = "ground"
+max_health = 50.0
+armor = 0.0
+move_speed = 80.0
+attack_damage = 15.0
+attack_range = 120.0
+attack_cooldown = 1.5
+sight_range = 180.0
+spice_cost = 60
+build_time = 3.0
+power_required = 1
+population_cost = 1
+abilities = []
+special_properties = {}
+texture_path = "res://textures/units/infantry.png"
+sounds = {}
+required_buildings = ["barracks"]
+required_tech = []

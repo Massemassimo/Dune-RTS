@@ -1,0 +1,27 @@
+[gd_resource type="Resource" format=3 load_steps=2]
+
+[ext_resource type="Script" path="res://scripts/data/UnitData.gd" id="1_0"]
+
+[resource]
+script = ExtResource("1_0")
+unit_id = "tank"
+unit_name = "Tank"
+description = "Heavy armored unit - slow but powerful"
+unit_type = "ground"
+max_health = 150.0
+armor = 2.0
+move_speed = 120.0
+attack_damage = 35.0
+attack_range = 200.0
+attack_cooldown = 2.0
+sight_range = 220.0
+spice_cost = 400
+build_time = 8.0
+power_required = 2
+population_cost = 3
+abilities = []
+special_properties = {}
+texture_path = "res://textures/units/tank.png"
+sounds = {}
+required_buildings = ["heavy_factory"]
+required_tech = []

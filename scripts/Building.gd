@@ -46,25 +46,9 @@ func _ready():
 		start_construction()
 
 func setup_visuals():
-	# Create sprite (placeholder colored rectangle)
+	# Create sprite with building-specific design
 	sprite = Sprite2D.new()
-	var texture = ImageTexture.new()
-	var image = Image.create(64, 64, false, Image.FORMAT_RGB8)
-	
-	# Color based on faction and building type
-	var color: Color
-	match faction:
-		GlobalEnums.Faction.ATREIDES:
-			color = Color.DARK_BLUE
-		GlobalEnums.Faction.HARKONNEN:
-			color = Color.DARK_RED
-		GlobalEnums.Faction.ORDOS:
-			color = Color.DARK_GREEN
-		_:
-			color = Color.DIM_GRAY
-	
-	image.fill(color)
-	texture.set_image(image)
+	var texture = create_building_texture()
 	sprite.texture = texture
 	add_child(sprite)
 	
@@ -118,7 +102,6 @@ func complete_construction():
 	is_constructed = true
 	construction_bar.visible = false
 	construction_complete.emit(self)
-	print("%s construction completed" % building_name)
 
 func handle_production(delta):
 	if not is_constructed:
@@ -231,13 +214,15 @@ func find_spawn_position() -> Vector2:
 	
 	return spawn_position
 
-func take_damage(damage: float):
+func take_damage(damage: float, attacker = null):
 	var actual_damage = max(damage - armor, 0)
 	current_health -= actual_damage
-	health_bar.value = current_health
-	health_bar.visible = current_health < max_health
 	
-	print("%s takes %d damage, health: %d" % [building_name, actual_damage, current_health])
+	# Update health bar if it exists
+	if health_bar:
+		health_bar.value = current_health
+		health_bar.visible = current_health < max_health
+	
 	
 	if current_health <= 0:
 		destroy()
@@ -266,6 +251,143 @@ func _draw():
 		# Draw selection rectangle
 		draw_rect(Rect2(-35, -35, 70, 70), Color.WHITE, false, 2.0)
 
+func create_building_texture() -> ImageTexture:
+	# Create building-specific visual based on building type
+	var texture = ImageTexture.new()
+	var image = Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	
+	# Get faction color
+	var primary_color = get_building_faction_color()
+	var dark_color = primary_color.darkened(0.3)
+	var light_color = primary_color.lightened(0.2)
+	var accent_color = Color(0.6, 0.6, 0.6)  # Gray for structural details
+	
+	# Fill background (transparent)
+	image.fill(Color.TRANSPARENT)
+	
+	# Create building-specific shape
+	match building_name:
+		"Barracks":
+			create_barracks_texture(image, primary_color, dark_color, light_color, accent_color)
+		"Refinery":
+			create_refinery_texture(image, primary_color, dark_color, light_color, accent_color)
+		"Heavy Factory":
+			create_factory_texture(image, primary_color, dark_color, light_color, accent_color)
+		_:
+			create_generic_building_texture(image, primary_color, dark_color, light_color)
+	
+	texture.set_image(image)
+	return texture
+
+func create_barracks_texture(image: Image, primary: Color, dark: Color, light: Color, accent: Color):
+	# Barracks: Military compound with main building and smaller structures
+	# Main building (large rectangle)
+	for y in range(8, 56):
+		for x in range(8, 56):
+			if x == 8 or x == 55 or y == 8 or y == 55:
+				image.set_pixel(x, y, dark)  # Outer walls
+			elif x < 12 or x > 51 or y < 12 or y > 51:
+				image.set_pixel(x, y, accent)  # Wall thickness
+			else:
+				image.set_pixel(x, y, primary)  # Interior
+	
+	# Entrance
+	for y in range(30, 34):
+		for x in range(8, 16):
+			image.set_pixel(x, y, Color.BLACK)  # Entrance door
+	
+	# Windows
+	for window_x in [20, 32, 44]:
+		for window_y in [16, 24, 40, 48]:
+			for wy in range(window_y, window_y + 4):
+				for wx in range(window_x, window_x + 4):
+					image.set_pixel(wx, wy, light)
+
+func create_refinery_texture(image: Image, primary: Color, dark: Color, light: Color, accent: Color):
+	# Refinery: Industrial complex with pipes and tanks
+	# Main structure
+	for y in range(4, 60):
+		for x in range(4, 60):
+			if x == 4 or x == 59 or y == 4 or y == 59:
+				image.set_pixel(x, y, dark)
+			elif x < 8 or x > 55 or y < 8 or y > 55:
+				image.set_pixel(x, y, accent)
+			else:
+				image.set_pixel(x, y, primary)
+	
+	# Storage tanks (circles)
+	for tank_x in [16, 48]:
+		for tank_y in [16, 48]:
+			for y in range(tank_y - 8, tank_y + 8):
+				for x in range(tank_x - 8, tank_x + 8):
+					var dx = x - tank_x
+					var dy = y - tank_y
+					if dx*dx + dy*dy <= 36:
+						if dx*dx + dy*dy <= 25:
+							image.set_pixel(x, y, light)  # Tank interior
+						else:
+							image.set_pixel(x, y, accent)  # Tank rim
+	
+	# Pipes connecting tanks
+	for x in range(24, 40):
+		image.set_pixel(x, 16, accent)
+		image.set_pixel(x, 48, accent)
+	for y in range(24, 40):
+		image.set_pixel(16, y, accent)
+		image.set_pixel(48, y, accent)
+
+func create_factory_texture(image: Image, primary: Color, dark: Color, light: Color, accent: Color):
+	# Heavy Factory: Large industrial building with smokestacks
+	# Main building (large rectangle)
+	for y in range(2, 62):
+		for x in range(2, 62):
+			if x == 2 or x == 61 or y == 2 or y == 61:
+				image.set_pixel(x, y, dark)
+			elif x < 6 or x > 57 or y < 6 or y > 57:
+				image.set_pixel(x, y, accent)
+			else:
+				image.set_pixel(x, y, primary)
+	
+	# Smokestacks
+	for stack_x in [16, 32, 48]:
+		for y in range(0, 8):
+			for x in range(stack_x - 2, stack_x + 3):
+				image.set_pixel(x, y, accent)
+		# Smoke effect
+		image.set_pixel(stack_x - 1, 0, Color.GRAY)
+		image.set_pixel(stack_x, 0, Color.GRAY)
+		image.set_pixel(stack_x + 1, 0, Color.GRAY)
+	
+	# Large factory door
+	for y in range(40, 56):
+		for x in range(20, 44):
+			if x == 20 or x == 43 or y == 40:
+				image.set_pixel(x, y, dark)
+			else:
+				image.set_pixel(x, y, Color.BLACK)
+
+func create_generic_building_texture(image: Image, primary: Color, dark: Color, light: Color):
+	# Generic building: Simple rectangular structure
+	for y in range(8, 56):
+		for x in range(8, 56):
+			if x == 8 or x == 55 or y == 8 or y == 55:
+				image.set_pixel(x, y, dark)
+			elif x < 12 or x > 51 or y < 12 or y > 51:
+				image.set_pixel(x, y, primary)
+			else:
+				image.set_pixel(x, y, light)
+
+func get_building_faction_color() -> Color:
+	match faction:
+		GlobalEnums.Faction.ATREIDES:
+			return Color(0.3, 0.5, 0.9)  # Blue
+		GlobalEnums.Faction.HARKONNEN:
+			return Color(0.9, 0.3, 0.3)  # Red  
+		GlobalEnums.Faction.ORDOS:
+			return Color(0.3, 0.8, 0.4)  # Green
+		_:
+			return Color(0.6, 0.6, 0.6)  # Gray
+
 func set_faction(new_faction: GlobalEnums.Faction):
 	faction = new_faction
 	if sprite:
@@ -282,6 +404,22 @@ func get_building_info() -> Dictionary:
 		"construction_progress": construction_progress,
 		"production_queue_size": production_queue.size(),
 		"current_production": current_production.get("type", "")
+	}
+
+func get_production_queue_info() -> Array:
+	return production_queue
+
+func get_production_progress() -> Dictionary:
+	if current_production.size() == 0:
+		return {"percentage": 0, "remaining_time": 0}
+	
+	var total_time = current_production.get("time", 5.0)
+	var percentage = (production_progress / total_time) * 100.0
+	var remaining_time = total_time - production_progress
+	
+	return {
+		"percentage": percentage,
+		"remaining_time": remaining_time
 	}
 
 func can_produce_unit(_unit_type: String) -> bool:
